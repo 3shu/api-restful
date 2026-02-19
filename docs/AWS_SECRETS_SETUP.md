@@ -253,6 +253,49 @@ docker exec -it api-restful-redis redis-cli FLUSHDB
 3. Delete unused secrets
 4. Use local development mode when possible
 
+## Informe técnico (resumen ejecutivo)
+
+Este repositorio implementa un enfoque de **microservicios por contexto** (`User` y `Book`) con un **Shared Kernel** que centraliza:
+
+- Gestión de conexiones a base de datos (`ConnectionManager` + `ConnectionFactory`)
+- Acceso seguro a credenciales (`SecretsManagerService`)
+- Caché de secretos en Redis (`SecretsCache`, TTL 1 hora)
+
+### ¿Por qué mantener esta arquitectura?
+
+1. **Escalabilidad operativa**: cada microservicio puede evolucionar y desplegarse con independencia.
+2. **Menor acoplamiento**: separar dominios (usuarios/libros) reduce impacto de cambios.
+3. **Seguridad consistente**: las credenciales no viven en código ni en archivos versionados.
+4. **Operación simple**: un único punto para resolver conexiones y secretos evita duplicación.
+5. **Auditoría y gobierno**: AWS Secrets Manager permite trazabilidad de acceso y rotación.
+
+### Estimación de costo mensual en AWS Secrets Manager
+
+Supuestos del escenario pedido:
+
+- 20 personas
+- 7 días por semana, ~30 días/mes
+- 15 horas por día por persona (turnos rotativos)
+- 2 secretos activos (los de este repo: MySQL + SQL Server)
+- Precio de referencia: **USD 0.40/secreto/mes** y **USD 0.05 por cada 10,000 llamadas** (`GetSecretValue`)
+
+Costo fijo de almacenamiento:
+
+- `2 secretos x USD 0.40 = USD 0.80/mes`
+
+Costo variable por obtención de secretos (sin cache compartida, consulta directa por intervalo):
+
+| Intervalo de obtención | Llamadas/mes (20 personas, 2 secretos) | Costo por API calls | Costo mensual total |
+|---|---:|---:|---:|
+| Cada 60 min | 18,000 | USD 0.09 | **USD 0.89** |
+| Cada 30 min | 36,000 | USD 0.18 | **USD 0.98** |
+| Cada 15 min | 72,000 | USD 0.36 | **USD 1.16** |
+| Cada 5 min | 216,000 | USD 1.08 | **USD 1.88** |
+
+> Fórmula usada: `llamadas_mes = personas x horas_dia x (60 / intervalo_min) x dias_mes x secretos`.
+
+Con la estrategia actual del repositorio (caché Redis con TTL de 1 hora), el costo variable baja de forma importante porque se evita consultar AWS en cada operación. En la práctica, el costo suele estar dominado por el número de secretos almacenados más que por las llamadas API.
+
 ### Delete Secrets (If Not Needed)
 ```bash
 aws secretsmanager delete-secret \
