@@ -1,0 +1,70 @@
+doctrine:
+    dbal:
+        default_connection: default
+        connections:
+            default:
+                url: '%env(resolve:DATABASE_URL_MYSQL_USERS)%'
+                driver: 'pdo_mysql'
+                server_version: '8.0'
+                charset: utf8mb4
+                default_table_options:
+                    charset: utf8mb4
+                    collate: utf8mb4_unicode_ci
+            
+            postgres:
+                url: '%env(resolve:DATABASE_URL_POSTGRES_BOOKS)%'
+                driver: 'pdo_pgsql'
+                server_version: '16'
+                charset: utf8
+
+    orm:
+        auto_generate_proxy_classes: true
+        enable_lazy_ghost_objects: true
+        default_entity_manager: default
+        entity_managers:
+            default:
+                connection: default
+                naming_strategy: doctrine.orm.naming_strategy.underscore_number_aware
+                auto_mapping: true
+                mappings:
+                    User:
+                        is_bundle: false
+                        dir: '%kernel.project_dir%/src/User/Domain/Entity'
+                        prefix: 'App\User\Domain\Entity'
+                        alias: User
+            
+            postgres:
+                connection: postgres
+                naming_strategy: doctrine.orm.naming_strategy.underscore_number_aware
+                mappings:
+                    Books:
+                        is_bundle: false
+                        dir: '%kernel.project_dir%/src/Book/Domain/Entity'
+                        prefix: 'App\Book\Domain\Entity'
+                        alias: Books
+
+when@test:
+    doctrine:
+        dbal:
+            # "TEST_TOKEN" is typically set by ParaTest
+            dbname_suffix: '_test%env(default::TEST_TOKEN)%'
+
+when@prod:
+    doctrine:
+        orm:
+            auto_generate_proxy_classes: false
+            proxy_dir: '%kernel.build_dir%/doctrine/orm/Proxies'
+            query_cache_driver:
+                type: pool
+                pool: doctrine.system_cache_pool
+            result_cache_driver:
+                type: pool
+                pool: doctrine.result_cache_pool
+
+    framework:
+        cache:
+            pools:
+                doctrine.result_cache_pool:
+                    adapter: cache.app
+                doctrine.system_cache_pool:
+                    adapter: cache.system

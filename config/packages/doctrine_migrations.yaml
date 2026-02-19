@@ -1,0 +1,12 @@
+doctrine_migrations:
+    migrations_paths:
+        'DoctrineMigrations': '%kernel.project_dir%/migrations'
+    
+    storage:
+        table_storage:
+            table_name: 'doctrine_migration_versions'
+    
+    organize_migrations: false
+    all_or_nothing: true
+    transactional: true
+    check_database_platform: true

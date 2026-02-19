@@ -1,0 +1,95 @@
+#!/usr/bin/env php
+<?php
+
+/**
+ * Health Check Script for Database Connections
+ * 
+ * This script tests all database connections configured in the system
+ * and reports their status.
+ */
+
+declare(strict_types=1);
+
+require_once __DIR__ . '/../vendor/autoload.php';
+
+use App\Kernel;
+use Symfony\Component\Dotenv\Dotenv;
+
+// Bootstrap Symfony
+(new Dotenv())->bootEnv(__DIR__ . '/../.env');
+
+$kernel = new Kernel($_ENV['APP_ENV'] ?? 'dev', (bool) ($_ENV['APP_DEBUG'] ?? true));
+$kernel->boot();
+$container = $kernel->getContainer();
+
+// Get Connection Manager
+$connectionManager = $container->get('connection_manager');
+
+echo "╔════════════════════════════════════════════════════════════╗\n";
+echo "║          DATABASE CONNECTIONS HEALTH CHECK                 ║\n";
+echo "╚════════════════════════════════════════════════════════════╝\n\n";
+
+$connections = [
+    'api-restful/mysql_users' => 'MySQL - Users Database',
+    'api-restful/sqlserver_books' => 'SQL Server - Books Database',
+];
+
+$results = [];
+$allHealthy = true;
+
+foreach ($connections as $name => $description) {
+    echo "Testing: {$description}\n";
+    echo str_repeat('-', 60) . "\n";
+    
+    try {
+        $connection = $connectionManager->getConnection($name);
+        
+        echo "  Connection Name: {$connection->getName()}\n";
+        echo "  Connection Type: {$connection->getType()}\n";
+        echo "  Status: ";
+        
+        if ($connection->isConnected()) {
+            echo "✅ CONNECTED\n";
+            $results[$name] = true;
+            
+            // Try a simple query
+            if (in_array($connection->getType(), ['mysql', 'sqlserver'])) {
+                $conn = $connection->getConnection();
+                $result = $conn->executeQuery('SELECT 1 as test')->fetchOne();
+                echo "  Query Test: ✅ SUCCESS (result: {$result})\n";
+            }
+        } else {
+            echo "❌ FAILED\n";
+            $results[$name] = false;
+            $allHealthy = false;
+        }
+        
+    } catch (\Exception $e) {
+        echo "  Status: ❌ ERROR\n";
+        echo "  Error: {$e->getMessage()}\n";
+        $results[$name] = false;
+        $allHealthy = false;
+    }
+    
+    echo "\n";
+}
+
+// Summary
+echo "╔════════════════════════════════════════════════════════════╗\n";
+echo "║                        SUMMARY                             ║\n";
+echo "╚════════════════════════════════════════════════════════════╝\n\n";
+
+$successCount = count(array_filter($results));
+$totalCount = count($results);
+
+echo "Total Connections: {$totalCount}\n";
+echo "Successful: {$successCount}\n";
+echo "Failed: " . ($totalCount - $successCount) . "\n\n";
+
+if ($allHealthy) {
+    echo "🎉 All connections are healthy!\n";
+    exit(0);
+} else {
+    echo "⚠️  Some connections failed. Please check the errors above.\n";
+    exit(1);
+}

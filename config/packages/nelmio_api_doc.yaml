@@ -1,0 +1,87 @@
+nelmio_api_doc:
+    documentation:
+        info:
+            title: 'API RESTful - Multi-Database MVP'
+            description: |
+                REST API con arquitectura hexagonal, principios SOLID y multi-base de datos.
+                
+                **Características:**
+                - User API: MySQL (CRUD completo)
+                - Book API: PostgreSQL (CRUD completo)
+                - AWS Secrets Manager para credenciales
+                - Redis cache para secrets
+                - Docker multi-container
+            version: '1.0.0'
+            contact:
+                name: API Support
+                email: support@example.com
+        servers:
+            - url: http://localhost:8080
+              description: Development server
+        components:
+            schemas:
+                User:
+                    type: object
+                    properties:
+                        id:
+                            type: integer
+                            example: 1
+                        email:
+                            type: string
+                            format: email
+                            example: 'john@example.com'
+                        name:
+                            type: string
+                            example: 'John Doe'
+                        phone:
+                            type: string
+                            nullable: true
+                            example: '1234567890'
+                        active:
+                            type: boolean
+                            example: true
+                        createdAt:
+                            type: string
+                            format: date-time
+                            example: '2026-02-19 21:22:08'
+                        updatedAt:
+                            type: string
+                            format: date-time
+                            nullable: true
+                            example: null
+                Book:
+                    type: object
+                    properties:
+                        id:
+                            type: integer
+                            example: 1
+                        title:
+                            type: string
+                            example: 'Clean Code'
+                        author:
+                            type: string
+                            example: 'Robert C. Martin'
+                        isbn:
+                            type: string
+                            nullable: true
+                            example: '978-0132350884'
+                        publishedDate:
+                            type: string
+                            format: date
+                            nullable: true
+                            example: '2008-08-01'
+                        active:
+                            type: boolean
+                            example: true
+                        createdAt:
+                            type: string
+                            format: date-time
+                            example: '2026-02-19 22:00:00'
+                        updatedAt:
+                            type: string
+                            format: date-time
+                            nullable: true
+                            example: null
+    areas:
+        path_patterns:
+            - ^/api(?!/doc$)

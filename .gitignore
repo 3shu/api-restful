@@ -1,0 +1,48 @@
+###> Symfony Files ###
+/.env.local
+/.env.local.php
+/.env.*.local
+/config/secrets/prod/prod.decrypt.private.php
+/public/bundles/
+/var/
+/vendor/
+###< Symfony Files ###
+
+###> IDE ###
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+###< IDE ###
+
+###> OS ###
+.DS_Store
+Thumbs.db
+###< OS ###
+
+###> Docker ###
+docker/mysql/data/
+docker/sqlserver/data/
+###< Docker ###
+
+###> Composer ###
+composer.phar
+/vendor/
+###< Composer ###
+
+###> AWS Credentials - NEVER COMMIT ###
+.aws/
+*.pem
+*.key
+###< AWS Credentials ###
+
+###> symfony/framework-bundle ###
+/.env.local
+/.env.local.php
+/.env.*.local
+/config/secrets/prod/prod.decrypt.private.php
+/public/bundles/
+/var/
+/vendor/
+###< symfony/framework-bundle ###
