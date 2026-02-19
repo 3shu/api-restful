@@ -274,7 +274,7 @@ Este repositorio implementa un enfoque de **microservicios por contexto** (`User
 Supuestos del escenario pedido:
 
 - 20 personas
-- 7 días por semana, ~30 días/mes
+- 7 días por semana, **30 días/mes** (supuesto fijo para el cálculo)
 - 15 horas por día por persona (turnos rotativos)
 - 2 secretos activos (los de este repo: MySQL + SQL Server)
 - Precio de referencia: **USD 0.40/secreto/mes** y **USD 0.05 por cada 10,000 llamadas** (`GetSecretValue`)
@@ -293,6 +293,12 @@ Costo variable por obtención de secretos (sin cache compartida, consulta direct
 | Cada 5 min | 216,000 | USD 1.08 | **USD 1.88** |
 
 > Fórmula usada: `llamadas_mes = personas x horas_dia x (60 / intervalo_min) x dias_mes x secretos`.
+> Donde `horas_dia` son horas por persona por día.
+>
+> Ejemplo (cada 60 min):
+> `20 x 15 x (60/60) x 30 x 2 = 18,000 llamadas/mes`.
+>
+> Costo API calls: `(llamadas_mes / 10,000) x USD 0.05` (mostrado con 2 decimales).
 
 Con la estrategia actual del repositorio (caché Redis con TTL de 1 hora), el costo variable baja de forma importante porque se evita consultar AWS en cada operación. En la práctica, el costo suele estar dominado por el número de secretos almacenados más que por las llamadas API.
 
