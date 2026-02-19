@@ -47,3 +47,4 @@ composer.phar
 /vendor/
 .env
 ###< symfony/framework-bundle ###
+.env
