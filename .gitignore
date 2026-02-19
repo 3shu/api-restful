@@ -45,4 +45,5 @@ composer.phar
 /public/bundles/
 /var/
 /vendor/
+.env
 ###< symfony/framework-bundle ###
