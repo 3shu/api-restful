@@ -274,10 +274,12 @@ Este repositorio implementa un enfoque de **microservicios por contexto** (`User
 Supuestos del escenario pedido:
 
 - 20 personas
-- 7 días por semana, con cálculo mensual sobre **30 días calendario** (no 4 semanas exactas)
+- 7 días por semana, con cálculo mensual sobre **30 días calendario promedio**
 - 15 horas por día por persona (turnos rotativos)
 - 2 secretos activos (los de este repo: MySQL + SQL Server)
 - Precio de referencia: **USD 0.40/secreto/mes** y **USD 0.05 por cada 10,000 llamadas** (`GetSecretValue`)
+
+> Nota: el costo real puede variar en meses de 28, 29 o 31 días.
 
 Costo fijo de almacenamiento:
 
@@ -292,9 +294,13 @@ Costo variable por obtención de secretos (sin cache compartida, consulta direct
 | Cada 15 min | 72,000 | USD 0.36 | **USD 1.16** |
 | Cada 5 min | 216,000 | USD 1.08 | **USD 1.88** |
 
+> Todos los montos se muestran en USD con redondeo a 2 decimales.
+
 > Fórmula usada: `llamadas_mes = personas x horas_dia x (60 / intervalo_min) x dias_mes x secretos`.
 > El término `(60 / intervalo_min)` representa las llamadas por hora.
 > Donde `horas_dia` son horas por persona por día.
+> Se asume consulta independiente por persona y por secreto en cada intervalo (sin caché compartida).
+> Este escenario representa un techo de consumo; en operación real el caché compartido reduce llamadas.
 >
 > Ejemplo (cada 60 min):
 > `20 x 15 x (60/60) x 30 x 2 = 18,000 llamadas/mes`.
