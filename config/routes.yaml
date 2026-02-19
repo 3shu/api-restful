@@ -11,3 +11,10 @@ book_controllers:
         path: ../src/Book/Infrastructure/Http/Controller/
         namespace: App\Book\Infrastructure\Http\Controller
     type: attribute
+
+# Product API Routes
+product_controllers:
+    resource:
+        path: ../src/Product/Infrastructure/Http/Controller/
+        namespace: App\Product\Infrastructure\Http\Controller
+    type: attribute

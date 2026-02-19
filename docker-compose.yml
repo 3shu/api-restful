@@ -93,6 +93,21 @@ services:
       timeout: 3s
       retries: 5
 
+  # DynamoDB Local - NoSQL Database for Products
+  dynamodb-local:
+    image: amazon/dynamodb-local:latest
+    container_name: api-restful-dynamodb
+    command: "-jar DynamoDBLocal.jar -sharedDb -inMemory"
+    ports:
+      - "8000:8000"
+    networks:
+      - api-network
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:8000/ || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
 ###> doctrine/doctrine-bundle ###
   database:
     image: postgres:${POSTGRES_VERSION:-16}-alpine

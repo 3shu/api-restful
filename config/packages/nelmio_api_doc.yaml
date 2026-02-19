@@ -8,6 +8,7 @@ nelmio_api_doc:
                 **Características:**
                 - User API: MySQL (CRUD completo)
                 - Book API: PostgreSQL (CRUD completo)
+                - Product API: DynamoDB Local (CRUD completo)
                 - AWS Secrets Manager para credenciales
                 - Redis cache para secrets
                 - Docker multi-container
@@ -77,6 +78,41 @@ nelmio_api_doc:
                             type: string
                             format: date-time
                             example: '2026-02-19 22:00:00'
+                        updatedAt:
+                            type: string
+                            format: date-time
+                            nullable: true
+                            example: null
+                Product:
+                    type: object
+                    properties:
+                        id:
+                            type: string
+                            example: 'prod_65c1234567890abcdef'
+                        name:
+                            type: string
+                            example: 'Laptop Dell XPS 15'
+                        description:
+                            type: string
+                            nullable: true
+                            example: 'High-performance laptop for professionals'
+                        price:
+                            type: number
+                            format: float
+                            example: 1299.99
+                        stock:
+                            type: integer
+                            example: 50
+                        category:
+                            type: string
+                            example: 'Electronics'
+                        active:
+                            type: boolean
+                            example: true
+                        createdAt:
+                            type: string
+                            format: date-time
+                            example: '2026-02-19 22:30:00'
                         updatedAt:
                             type: string
                             format: date-time

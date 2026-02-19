@@ -94,3 +94,27 @@ services:
     App\Book\Infrastructure\Http\Controller\:
         resource: '../src/Book/Infrastructure/Http/Controller/'
         tags: ['controller.service_arguments']
+
+    # DynamoDB Client for Product Repository
+    Aws\DynamoDb\DynamoDbClient:
+        factory: ['Aws\DynamoDb\DynamoDbClient', 'factory']
+        arguments:
+            -
+                version: 'latest'
+                region: 'us-east-1'
+                endpoint: 'http://dynamodb-local:8000'
+                credentials:
+                    key: 'dummy'
+                    secret: 'dummy'
+
+    # Product Repository (DynamoDB)
+    App\Product\Infrastructure\Persistence\DynamoDB\ProductRepository:
+        arguments:
+            $dynamoDb: '@Aws\DynamoDb\DynamoDbClient'
+
+    App\Product\Domain\Repository\ProductRepositoryInterface:
+        alias: App\Product\Infrastructure\Persistence\DynamoDB\ProductRepository
+
+    App\Product\Infrastructure\Http\Controller\:
+        resource: '../src/Product/Infrastructure/Http/Controller/'
+        tags: ['controller.service_arguments']
